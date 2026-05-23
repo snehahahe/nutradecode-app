@@ -1,22 +1,45 @@
 import streamlit as st
 import requests
 
-# 1. Set up the aesthetic look of the website (Now with the cookie emoji!)
+# 1. WEB DESIGN MAGIC (Adding your custom fonts and colors)
+custom_css = """
+<style>
+    /* Change the font of the entire app to Arial Unicode */
+    html, body, [class*="css"]  {
+        font-family: 'Arial Unicode MS', Arial, sans-serif !important;
+    }
+    
+    /* Change the specific title font to TAN MON CHERIE */
+    .custom-title {
+        font-family: 'TAN MON CHERIE', 'Playfair Display', serif !important;
+        font-size: 3.5rem;
+        font-weight: bold;
+        color: #2E4035; /* A dark, aesthetic, earthy green */
+        margin-bottom: -10px;
+    }
+</style>
+"""
+
+# 2. Set up the page
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
 
-st.title("🍃 NutraDecode")
+# Inject the custom fonts into the app
+st.markdown(custom_css, unsafe_allow_html=True)
+
+# 3. The New Beautiful Custom Title
+st.markdown('<p class="custom-title">🍃 NutraDecode</p>', unsafe_allow_html=True)
 st.markdown("**Your transparent, AI-powered product label decoder.**")
 st.markdown("Enter a product barcode below to pull **real, factual data** directly from global food databases.")
+st.markdown("---")
 
-# 2. Create the search bar
+# 4. Create the search bar
 barcode = st.text_input("Enter Product Barcode (e.g., 049000000443 for Sprite):")
 
-# 3. What happens when the user clicks the button
+# 5. What happens when the user clicks the button
 if st.button("Decode Product"):
     if barcode:
         with st.spinner("Fetching factual data from Open Food Facts..."):
             
-            # The User-Agent ID card so the database doesn't block us
             url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
             headers = {"User-Agent": "NutraDecode_Portfolio_App/1.0"}
             
@@ -30,7 +53,6 @@ if st.button("Decode Product"):
                     
                     st.success("Product found!")
                     
-                    # Create two columns for a beautiful layout
                     col1, col2 = st.columns([1, 2])
                     
                     with col1:
@@ -55,9 +77,9 @@ if st.button("Decode Product"):
                             st.write("No additives detected.")
                             
                 else:
-                    st.error("Product not found in the global database. Please try another barcode.")
+                    # THE UX FIX: Your custom friendly message!
+                    st.info("We couldn't find this barcode in the database. But don't worry! **Upload a picture of the ingredients**, or **type the product name**, and our AI will decode it for you right now.")
             
-            # The Safety Net
             except Exception as e:
                 st.error("Oops! The global database is currently unavailable. Please try again later.")
     else:
