@@ -1,0 +1,16 @@
+[theme]
+# The main accent color (used for buttons, radio circles, and highlights)
+# We are using a beautiful, rich "Matcha/Earthy Green"
+primaryColor = "#3B5A3F"
+
+# The main background of the app (a very clean, soft off-white)
+backgroundColor = "#FAFCFA"
+
+# The background of the sidebar (a slightly darker, calming sage tint)
+secondaryBackgroundColor = "#E8F0E8"
+
+# The color of the text (A very dark slate-green instead of harsh black)
+textColor = "#1A261D"
+
+# The font style
+font = "sans serif"
