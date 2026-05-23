@@ -6,11 +6,11 @@ from PIL import Image
 # 1. Set up the page
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
 
-# Configure Google Gemini (Using the 'latest' model version)
+# Configure Google Gemini (Using the official 1.5 Flash model)
 api_key = st.secrets.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
+    model = genai.GenerativeModel('gemini-1.5-flash')
 
 # Header
 st.title("🍃 NutraDecode")
