@@ -4,6 +4,7 @@ import google.generativeai as genai
 from PIL import Image
 import plotly.graph_objects as go
 import re
+import urllib.parse
 
 # 1. Set up the page
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
@@ -15,7 +16,6 @@ with st.sidebar:
     st.markdown("### 👤 Your Dietary Profile")
     st.write("Set your restrictions so our AI can warn you of harmful ingredients.")
     
-    # User selects their dietary profile
     diet_prefs = st.multiselect(
         "Select all that apply:", 
         ["Vegan", "Vegetarian", "Keto", "Halal", "Kosher", "Nut Allergy", "Celiac / Gluten-Free", "Pregnant"]
@@ -47,14 +47,14 @@ def draw_nutrascore(score):
         title = {'text': "<b>NutraScore</b><br><span style='font-size:0.8em;color:gray'>100 = Optimal Health | 0 = Highly Processed</span>"},
         gauge = {
             'axis': {'range': [0, 100], 'tickwidth': 1},
-            'bar': {'color': "rgba(0,0,0,0)"}, # Hides the default bar
+            'bar': {'color': "rgba(0,0,0,0)"}, 
             'bgcolor': "white",
             'borderwidth': 2,
             'bordercolor': "gray",
             'steps': [
-                {'range': [0, 39], 'color': "#FF4B4B"},   # Red (F)
-                {'range': [40, 69], 'color': "#FFA500"},  # Orange/Yellow (C)
-                {'range': [70, 100], 'color': "#2E8B57"}  # Green (A)
+                {'range': [0, 39], 'color': "#FF4B4B"},   
+                {'range': [40, 69], 'color': "#FFA500"},  
+                {'range': [70, 100], 'color': "#2E8B57"}  
             ],
             'threshold': {
                 'line': {'color': "black", 'width': 4},
@@ -66,11 +66,71 @@ def draw_nutrascore(score):
     fig.update_layout(height=300, margin=dict(l=10, r=10, t=50, b=10))
     return fig
 
+# Function to grab images from the internet based on text search
+def fetch_image_by_name(product_name):
+    try:
+        safe_name = urllib.parse.quote(product_name)
+        url = f"https://world.openfoodfacts.org/cgi/search.pl?search_terms={safe_name}&search_simple=1&action=process&json=1&page_size=1"
+        headers = {"User-Agent": "NutraDecode_Portfolio_App/1.0"}
+        res = requests.get(url, headers=headers).json()
+        if res.get("products") and len(res["products"]) > 0:
+            return res["products"][0].get("image_url", None)
+    except:
+        return None
+    return None
+
 # Header
 st.title("🍃 NutraDecode")
 st.markdown("**Your transparent, product label decoder.**")
+st.markdown("---")
 
-st.markdown("### 🧠 Product Scanner")
+# ==========================================
+# TOOL 1: THE BARCODE SCANNER
+# ==========================================
+st.markdown("### 🔍 Option 1: Quick Barcode Scan")
+barcode = st.text_input("Enter Product Barcode (e.g., 049000000443 for Sprite):")
+
+if st.button("Scan Barcode"):
+    if barcode:
+        with st.spinner("Fetching factual data from Open Food Facts..."):
+            url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
+            headers = {"User-Agent": "NutraDecode_Portfolio_App/1.0"}
+            try:
+                response = requests.get(url, headers=headers)
+                data = response.json() 
+                if data.get("status") == 1:
+                    product = data["product"]
+                    st.success("Product found!")
+                    col1, col2 = st.columns([1, 2])
+                    
+                    # Fetches picture for Barcode
+                    with col1:
+                        image_url = product.get("image_url", "")
+                        if image_url:
+                            st.image(image_url, use_column_width=True)
+                        else:
+                            st.write("No image available.")
+                            
+                    with col2:
+                        st.subheader(product.get("product_name", "Unknown Product"))
+                        st.info(f"**Ingredients:** {product.get('ingredients_text', 'None listed.')}")
+                        additives = product.get("additives_tags", [])
+                        if additives:
+                            clean_additives = [add.replace("en:", "").upper() for add in additives]
+                            st.table({"Chemical Additives": clean_additives})
+                else:
+                    st.info("We couldn't find this barcode. Scroll down to use the Label Decoder instead! 👇")
+            except Exception as e:
+                st.error("Database unavailable. Please use the Label Decoder below.")
+    else:
+        st.warning("Please enter a barcode first.")
+
+st.markdown("---")
+
+# ==========================================
+# TOOL 2: THE AI LABEL DECODER
+# ==========================================
+st.markdown("### 🧠 Option 2: Label Decoder")
 category = st.radio("What are we scanning today?", ("🍎 Food Products / Snacks", "💊 Supplements / Medicine"))
 upload_type = st.radio("How do you want to input the product?", ("📸 Upload an Image", "⌨️ Type the Product Name"))
 
@@ -85,10 +145,8 @@ if upload_type == "📸 Upload an Image":
 else:
     product_name = st.text_input("Enter the exact product name (e.g., 'Doritos' or 'Advil'):")
 
-# Format the dietary preferences to tell the AI
 diet_string = ", ".join(diet_prefs) if diet_prefs else "None"
 
-# The NEW Advanced Master Prompt
 system_prompt = f"""
 You are "NutraDecode," an elite Food Scientist and Pharmacist AI.
 CRITICAL RULE: Identify the EXACT product ingredients using your knowledge base. Do not guess.
@@ -112,7 +170,7 @@ NUTRASCORE: [number]
 ⚠️ **Scientific Backing & PubMed Citations:**
 - Identify the most controversial or harmful ingredient (e.g., Red 40, Titanium Dioxide).
 - Provide a summary of its health effects.
-- Provide a simulated link to a real PubMed or NIH study regarding this ingredient (e.g., "Study: Effects of [Ingredient] - pubmed.ncbi.nlm.nih.gov/search...").
+- Provide a simulated link to a real PubMed or NIH study regarding this ingredient.
 
 🔄 **Healthy Alternative Recommender:**
 - Suggest 3 healthier, less processed alternatives to this product that have higher NutraScores.
@@ -126,6 +184,13 @@ if st.button("Decode ✨"):
     else:
         with st.spinner("Analyzing profile, calculating NutraScore, and fetching scientific data..."):
             try:
+                # 1. Fetch image from the internet if they typed a name
+                if upload_type == "⌨️ Type the Product Name" and product_name:
+                    fetched_image = fetch_image_by_name(product_name)
+                    if fetched_image:
+                        st.image(fetched_image, caption=f"Image found for: {product_name}", width=250)
+
+                # 2. Ask the AI
                 if user_image is not None:
                     response = model.generate_content([system_prompt, user_image])
                 else:
@@ -133,18 +198,15 @@ if st.button("Decode ✨"):
                 
                 result_text = response.text
                 
-                # Extract the NutraScore using Python logic
-                score = 50 # Default
+                # Extract NutraScore
+                score = 50 
                 match = re.search(r'NUTRASCORE:\s*(\d+)', result_text)
                 if match:
                     score = int(match.group(1))
-                    # Remove the "NUTRASCORE: 85" line from the text so it looks clean
                     result_text = re.sub(r'NUTRASCORE:\s*\d+\n?', '', result_text)
                 
-                # Display the Gauge Chart!
+                # Display Gauge Chart and Text
                 st.plotly_chart(draw_nutrascore(score), use_container_width=True)
-                
-                # Display the rest of the analysis
                 st.markdown(result_text)
                 
             except Exception as e:
