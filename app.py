@@ -22,7 +22,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.caption("⚠️ **Disclaimer:** This tool provides scientific analysis for informational purposes only. It does not constitute medical advice.")
+    st.caption("⚠️ **Health Disclaimer:** This tool provides scientific analysis for informational purposes only. It does not constitute medical advice.")
 
 # Configure Google Gemini
 api_key = st.secrets.get("GEMINI_API_KEY")
@@ -103,7 +103,6 @@ if st.button("Scan Barcode"):
                     st.success("Product found!")
                     col1, col2 = st.columns([1, 2])
                     
-                    # Fetches picture for Barcode
                     with col1:
                         image_url = product.get("image_url", "")
                         if image_url:
@@ -209,5 +208,15 @@ if st.button("Decode ✨"):
                 st.plotly_chart(draw_nutrascore(score), use_container_width=True)
                 st.markdown(result_text)
                 
+                # 3. Add the special "Type Name" Tip Disclaimer
+                if upload_type == "⌨️ Type the Product Name":
+                    st.info("💡 **Tip:** For the most accurate and up-to-date analysis, upload a clear picture of the product's actual ingredient label from the back of the package.")
+                
             except Exception as e:
                 st.error(f"An error occurred: {e}")
+
+# ==========================================
+# UNIVERSAL LEGAL FOOTER
+# ==========================================
+st.markdown("---")
+st.caption("⚖️ **Legal & AI Disclaimer:** The insights, alternative recommendations, and NutraScores provided by this application are generated using artificial intelligence and open-source databases. They are for educational and informational purposes only. This tool is **not** intended to malign, harm, or defame any specific company, brand, organization, or food product. AI can occasionally make mistakes or hallucinate; always verify ingredients directly on the physical product label.")
