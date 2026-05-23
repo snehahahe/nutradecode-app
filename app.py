@@ -2,9 +2,9 @@ import streamlit as st
 import requests
 
 # 1. Set up the aesthetic look of the website (Now with the cookie emoji!)
-st.set_page_config(page_title="NutraDec🍪de", page_icon="🍃", layout="centered")
+st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
 
-st.title("🍃 NutraDec🍪de")
+st.title("🍃 NutraDecode")
 st.markdown("**Your transparent, AI-powered product label decoder.**")
 st.markdown("Enter a product barcode below to pull **real, factual data** directly from global food databases.")
 
