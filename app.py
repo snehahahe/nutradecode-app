@@ -6,11 +6,28 @@ from PIL import Image
 # 1. Set up the page
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
 
-# Configure Google Gemini (Using the official 1.5 Flash model)
+# Configure Google Gemini with Auto-Detect to prevent 404 errors!
 api_key = st.secrets.get("GEMINI_API_KEY")
+model = None
+
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    try:
+        # Ask Google what models this specific API key is allowed to use
+        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        
+        if 'models/gemini-1.5-flash' in available_models:
+            model = genai.GenerativeModel('gemini-1.5-flash')
+        elif 'models/gemini-1.5-pro' in available_models:
+            model = genai.GenerativeModel('gemini-1.5-pro')
+        elif 'models/gemini-1.0-pro' in available_models:
+            model = genai.GenerativeModel('gemini-1.0-pro')
+        else:
+            # If all else fails, just pick the very first one Google allows
+            fallback_name = available_models[0].replace('models/', '')
+            model = genai.GenerativeModel(fallback_name)
+    except Exception as e:
+        st.error(f"Error connecting to Google: {e}")
 
 # Header
 st.title("🍃 NutraDecode")
@@ -124,6 +141,8 @@ If the category is 🍎 Food Products / Snacks, format your EXACT output like th
 if st.button("Decode ✨"):
     if not api_key:
         st.error("API Key missing! Please check your Streamlit secrets.")
+    elif model is None:
+        st.error("Google AI could not be loaded. Please check your API key permissions.")
     elif user_image is None and product_name == "":
         st.warning("Please upload an image or type a product name first!")
     else:
