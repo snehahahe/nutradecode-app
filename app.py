@@ -6,11 +6,11 @@ from PIL import Image
 # 1. Set up the page
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
 
-# Configure Google Gemini AI
+# Configure Google Gemini (Using the 'latest' model version)
 api_key = st.secrets.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
 # Header
 st.title("🍃 NutraDecode")
@@ -46,19 +46,19 @@ if st.button("Scan Barcode"):
                             clean_additives = [add.replace("en:", "").upper() for add in additives]
                             st.table({"Chemical Additives": clean_additives})
                 else:
-                    st.info("We couldn't find this barcode. Scroll down to use the AI Scanner instead! 👇")
+                    st.info("We couldn't find this barcode. Scroll down to use the Label Decoder instead! 👇")
             except Exception as e:
-                st.error("Database unavailable. Please use the AI scanner below.")
+                st.error("Database unavailable. Please use the Label Decoder below.")
     else:
         st.warning("Please enter a barcode first.")
 
 st.markdown("---")
 
 # ==========================================
-# TOOL 2: THE AI MASTER SCANNER
+# TOOL 2: THE LABEL DECODER
 # ==========================================
-st.markdown("### 🧠 Option 2: AI Label Decoder")
-st.markdown("Upload a picture of the ingredients, or type the product name to have our AI decode it.")
+st.markdown("### 🧠 Option 2: Label Decoder")
+st.markdown("Upload a picture of the ingredients, or type the product name to have it decoded.")
 
 # User Choices
 category = st.radio("1. What are we scanning today?", ("💊 Supplements / Medicine", "🍎 Food Products / Snacks"))
@@ -75,7 +75,7 @@ if upload_type == "📸 Upload an Image":
 else:
     product_name = st.text_input("Enter the exact product name (e.g., 'Oreo Cookies' or 'Advil'):")
 
-# Your Master Prompt!
+# Your Master Prompt
 system_prompt = f"""
 You are "NutraDecode," an expert Food Scientist and Pharmacist scanner app.
 
@@ -121,7 +121,7 @@ If the category is 🍎 Food Products / Snacks, format your EXACT output like th
 - [Serving size context and best time to eat it].
 """
 
-if st.button("Decode with AI ✨"):
+if st.button("Decode ✨"):
     if not api_key:
         st.error("API Key missing! Please check your Streamlit secrets.")
     elif user_image is None and product_name == "":
@@ -133,7 +133,7 @@ if st.button("Decode with AI ✨"):
                 if user_image is not None:
                     response = model.generate_content([system_prompt, user_image])
                 else:
-                    response = model.generate_content([system_prompt, product_name])
+                    response = model.generate_content(f"{system_prompt}\n\nProduct Name: {product_name}")
                 
                 # Show result
                 st.success("Analysis Complete!")
