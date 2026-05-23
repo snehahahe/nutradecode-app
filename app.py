@@ -5,6 +5,27 @@ from PIL import Image
 
 # 1. Set up the page
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
+import streamlit as st
+import requests
+import google.generativeai as genai
+from PIL import Image
+
+# 1. Set up the page
+st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
+
+# --- NEW: THE PROFESSIONAL SIDEBAR ---
+with st.sidebar:
+    st.title("🍃 About NutraDecode")
+    st.write("NutraDecode is an advanced, AI-powered tool designed to bring radical transparency to food and supplement labels.")
+    st.write("**Tech Stack:**")
+    st.write("• Python & Streamlit\n• Open Food Facts API\n• Google Gemini Vision AI")
+    st.markdown("---")
+    st.caption("⚠️ **Disclaimer:** This tool provides scientific analysis for informational purposes only. It does not constitute medical advice. Always consult a healthcare professional before changing your diet or supplement routine.")
+# -------------------------------------
+
+# Configure Google Gemini with Auto-Detect
+api_key = st.secrets.get("GEMINI_API_KEY")
+# ... (Keep the rest of your code exactly the same below this!)
 
 # Configure Google Gemini with Auto-Detect to prevent 404 errors!
 api_key = st.secrets.get("GEMINI_API_KEY")
