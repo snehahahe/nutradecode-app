@@ -1,41 +1,18 @@
 import streamlit as st
 import requests
 
-# 1. WEB DESIGN MAGIC (Adding your custom fonts and colors)
-custom_css = """
-<style>
-    /* Change the font of the entire app to Arial Unicode */
-    html, body, [class*="css"]  {
-        font-family: 'Arial Unicode MS', Arial, sans-serif !important;
-    }
-    
-    /* Change the specific title font to TAN MON CHERIE */
-    .custom-title {
-        font-family: 'TAN MON CHERIE', 'Playfair Display', serif !important;
-        font-size: 3.5rem;
-        font-weight: bold;
-        color: #2E4035; /* A dark, aesthetic, earthy green */
-        margin-bottom: -10px;
-    }
-</style>
-"""
-
-# 2. Set up the page
+# 1. Set up the page (Default font)
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="centered")
 
-# Inject the custom fonts into the app
-st.markdown(custom_css, unsafe_allow_html=True)
-
-# 3. The New Beautiful Custom Title
-st.markdown('<p class="custom-title">🍃 NutraDecode</p>', unsafe_allow_html=True)
-st.markdown("**Your transparent, AI-powered product label decoder.**")
+st.title("🍃 NutraDecode")
+st.markdown("**Your transparent, product label decoder.**")
 st.markdown("Enter a product barcode below to pull **real, factual data** directly from global food databases.")
 st.markdown("---")
 
-# 4. Create the search bar
+# 2. Create the search bar
 barcode = st.text_input("Enter Product Barcode (e.g., 049000000443 for Sprite):")
 
-# 5. What happens when the user clicks the button
+# 3. What happens when the user clicks the button
 if st.button("Decode Product"):
     if barcode:
         with st.spinner("Fetching factual data from Open Food Facts..."):
