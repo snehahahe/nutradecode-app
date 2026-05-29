@@ -25,10 +25,26 @@ st.markdown(f"""
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; background-color: #FFFFFF; }}
 
     /* Navbar */
-    .nav-container {{ display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }}
-    .logo-img {{ height: 50px; }}
-    .nav-links a {{ text-decoration: none; color: #4B5563; margin-left: 30px; font-size: 15px; font-weight: 600; }}
-    .btn-get-started {{ background: #2E4035; color: white !important; padding: 10px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; }}
+    # 4. NAVBAR (Updated for GitHub Hosting)
+logo_url = "https://raw.githubusercontent.com/snehahahe/nutradecode-official/main/logo.png"
+
+st.markdown(f"""
+<div class="nav-container">
+    <img src="{logo_url}" style="height: 60px; width: auto; object-fit: contain;">
+    <div class="nav-links">
+        <a href="#">How it works</a>
+        <a href="#">About</a>
+        <a href="#">Privacy</a>
+        <a class="btn-get-started" href="#">Get Started</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Also update the SIDEBAR logo
+with st.sidebar:
+    st.image(logo_url, width=180)
+    st.markdown("---")
+    diet_prefs = st.multiselect("Your Dietary Profile:", ["Vegan", "Keto", "Halal", "Nut Allergy", "Pregnant"])ration: none; }}
 
     /* Hero */
     .hero-title {{ font-size: 64px; font-weight: 800; color: #1A261D; line-height: 1.1; margin-top: 40px; }}
