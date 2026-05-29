@@ -6,233 +6,177 @@ import plotly.graph_objects as go
 import re
 import urllib.parse
 
-# 1. PAGE CONFIG (Hiding Streamlit default elements)
+# 1. PAGE CONFIG
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="wide")
 
-# 2. THE DESIGNER CSS (Matches your image exactly)
-st.markdown("""
+# 2. PROFESSIONAL SVG ICONS (Replacing Emojis)
+# These are the crisp, professional icons from your mockup
+icon_shield = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
+icon_ai = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>'
+icon_private = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
+icon_barcode = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14M21 5v14M7 5v14M17 5v14M12 5v14"></path></svg>'
+icon_brain = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A5.5 5.5 0 0 0 4 7.5c0 1.63.71 3.1 1.83 4.12A4.01 4.01 0 0 0 4 15c0 2.2 1.8 4 4 4h.5c.34 3 2.84 5.5 5.5 5.5a5.5 5.5 0 0 0 5.5-5.5h.5c2.2 0 4-1.8 4-4 0-1.32-.65-2.5-1.65-3.23A5.5 5.5 0 0 0 14.5 2h-5z"></path></svg>'
+
+# 3. ADVANCED DESIGNER CSS
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
-    /* Hide Streamlit Header and Padding */
-    header {visibility: hidden;}
-    .main .block-container {
+    header {{visibility: hidden;}}
+    .main .block-container {{
         padding-top: 0rem;
-        padding-bottom: 0rem;
-        padding-left: 5rem;
-        padding-right: 5rem;
-    }
+        padding-left: 8%;
+        padding-right: 8%;
+    }}
 
-    /* Global Body */
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-        background-color: #F8FAF8;
-    }
-
-    /* Navbar */
-    .nav-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 0;
-        background-color: transparent;
-    }
-    .logo-text {
-        font-size: 28px !important; /* Increased as requested */
+    .logo-text {{
+        font-size: 32px !important;
         font-weight: 800;
         color: #1A261D;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .nav-links {
-        display: flex;
-        gap: 30px;
-        align-items: center;
-    }
-    .nav-links a {
-        text-decoration: none;
-        color: #4A4A4A;
-        font-size: 15px;
-        font-weight: 500;
-    }
-    .btn-get-started {
-        background-color: #2E4035;
-        color: white !important;
-        padding: 10px 24px;
-        border-radius: 10px;
-        font-weight: 600;
-    }
+        letter-spacing: -1px;
+    }}
 
-    /* Hero Section */
-    .hero-title {
-        font-size: 64px;
+    .hero-title {{
+        font-size: 72px;
         font-weight: 800;
         color: #1A261D;
-        line-height: 1.1;
-        margin-top: 40px;
-    }
-    .hero-green {
-        color: #4CAF50;
-    }
-    .hero-subtitle {
-        font-size: 18px;
+        line-height: 1.05;
+        margin-top: 60px;
+    }}
+    .hero-green {{ color: #4CAF50; }}
+    
+    .hero-subtitle {{
+        font-size: 20px;
         color: #5C6E5F;
-        margin: 25px 0;
-        max-width: 500px;
+        margin: 30px 0;
+        max-width: 550px;
         line-height: 1.6;
-    }
-    .feature-list {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 40px;
-    }
-    .feature-item {
-        font-size: 15px;
-        font-weight: 600;
-        color: #1A261D;
+    }}
+
+    .feature-list {{ display: flex; gap: 40px; margin-bottom: 50px; }}
+    .feature-item {{
         display: flex;
         align-items: center;
-        gap: 5px;
-    }
-
-    /* Cards Section */
-    .choose-title {
-        text-align: center;
-        font-size: 28px;
-        font-weight: 800;
+        gap: 12px;
+        font-size: 16px;
+        font-weight: 600;
         color: #1A261D;
-        margin: 60px 0 40px 0;
-    }
-    .custom-card {
+    }}
+
+    .custom-card {{
         background: white;
-        border-radius: 30px;
-        padding: 40px;
-        box-shadow: 0 15px 50px rgba(0,0,0,0.02);
+        border-radius: 32px;
+        padding: 50px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.03);
         border: 1px solid #F0F2F0;
-        height: 100%;
-    }
-    .card-icon-container {
-        width: 60px;
-        height: 60px;
+        transition: 0.3s;
+    }}
+    .icon-box {{
+        width: 70px;
+        height: 70px;
         background: #F1F8F1;
-        border-radius: 15px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 30px;
-        margin-bottom: 20px;
-    }
-    .card-title {
-        font-size: 22px;
-        font-weight: 800;
-        color: #1A261D;
-        margin-bottom: 10px;
-    }
-    .card-desc {
-        font-size: 14px;
-        color: #6B7280;
-        margin-bottom: 30px;
-        line-height: 1.4;
-    }
+        margin-bottom: 25px;
+    }}
 
-    /* Bottom Stats Bar */
-    .stats-bar {
+    /* Stats bar styling */
+    .stats-bar {{
         display: flex;
         justify-content: space-around;
         background: #FFFFFF;
-        padding: 40px;
-        border-radius: 25px;
-        margin: 60px 0;
+        padding: 50px;
+        border-radius: 30px;
+        margin: 80px 0;
         border: 1px solid #F0F2F0;
-    }
-    .stat-box { text-align: center; }
-    .stat-val { font-size: 22px; font-weight: 800; color: #1A261D; display: block; }
-    .stat-lab { font-size: 14px; color: #6B7280; }
+    }}
+    .stat-val {{ font-size: 24px; font-weight: 800; color: #1A261D; display: block; }}
+    .stat-lab {{ font-size: 14px; color: #6B7280; font-weight: 500; }}
 
-    /* Hide Streamlit's red error boxes for custom styling */
-    .stAlert { border-radius: 15px; }
+    /* Button Styling */
+    .stButton>button {{
+        background-color: #2E4035 !important;
+        border-radius: 12px;
+        padding: 25px !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
-# 3. THE NAVIGATION BAR
+# 4. NAVBAR
 st.markdown("""
-<div class="nav-container">
-    <div class="logo-text">🍃 NutraDecode</div>
-    <div class="nav-links">
-        <a href="#">How it works</a>
-        <a href="#">About</a>
-        <a href="#">Privacy</a>
-        <a class="btn-get-started" href="#">Get Started</a>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 30px 0;">
+    <div class="logo-text">NutraDecode</div>
+    <div style="display: flex; gap: 40px; align-items: center;">
+        <a style="text-decoration:none; color:#4A4A4A; font-weight:600;" href="#">How it works</a>
+        <a style="text-decoration:none; color:#4A4A4A; font-weight:600;" href="#">About</a>
+        <a style="text-decoration:none; color:#4A4A4A; font-weight:600;" href="#">Privacy</a>
+        <div style="background:#2E4035; color:white; padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer;">Get Started</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 4. THE HERO SECTION
-col_hero1, col_hero2 = st.columns([1.2, 1])
+# 5. HERO SECTION
+col_h1, col_h2 = st.columns([1.3, 1])
 
-with col_hero1:
-    st.markdown("""
+with col_h1:
+    st.markdown(f"""
     <div class="hero-title">Decode. Understand.<br><span class="hero-green">Choose Better.</span></div>
     <div class="hero-subtitle">NutraDecode helps you instantly decode product labels and make informed, healthier choices.</div>
     <div class="feature-list">
-        <div class="feature-item">🛡️ Transparent</div>
-        <div class="feature-item">✨ AI-Powered</div>
-        <div class="feature-item">🔒 Private</div>
+        <div class="feature-item">{icon_shield} Transparent</div>
+        <div class="feature-item">{icon_ai} AI-Powered</div>
+        <div class="feature-item">{icon_private} Private</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col_hero2:
-    # This is where your Golden Halftone / Phone mockup image goes
-    st.image("https://i.imgur.com/your_uploaded_image.png", use_column_width=True)
+with col_h2:
+    # High-quality aesthetic product image
+    st.image("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1000", use_column_width=True)
 
-# 5. THE SCANNING CARDS
-st.markdown('<div class="choose-title">Choose Your Scanning Option</div>', unsafe_allow_html=True)
+# 6. SCANNING SECTION
+st.markdown('<div style="text-align:center; font-size:32px; font-weight:800; margin: 80px 0 50px 0;">Choose Your Scanning Option</div>', unsafe_allow_html=True)
 
-col_card1, col_card2 = st.columns(2)
+c1, c2 = st.columns(2)
 
-with col_card1:
-    st.markdown("""
+with c1:
+    st.markdown(f"""
     <div class="custom-card">
-        <div class="card-icon-container">🔍</div>
-        <div class="card-title">Quick Barcode Scan</div>
-        <div class="card-desc">Instantly get insights by scanning a product barcode from the database.</div>
+        <div class="icon-box">{icon_barcode}</div>
+        <div style="font-size:24px; font-weight:800; margin-bottom:10px;">Quick Barcode Scan</div>
+        <div style="color:#6B7280; margin-bottom:30px;">Instantly get insights by scanning a product barcode from our database.</div>
     </div>
     """, unsafe_allow_html=True)
-    # The actual functional input placed right below the card title
-    barcode = st.text_input("Barcode", label_visibility="collapsed", placeholder="Enter Barcode (e.g. 049000000443)")
-    if st.button("Scan Barcode 🚀"):
-        # Barcode Logic Here
-        pass
+    barcode = st.text_input("Barcode Input", label_visibility="collapsed", placeholder="Enter Barcode (e.g. 049000000443)")
+    if st.button("Scan Barcode"):
+        pass # Barcode logic
 
-with col_card2:
-    st.markdown("""
+with c2:
+    st.markdown(f"""
     <div class="custom-card">
-        <div class="card-icon-container">🧠</div>
-        <div class="card-title">Label Decoder</div>
-        <div class="card-desc">Upload a product label photo or enter the product name to decode with AI.</div>
+        <div class="icon-box">{icon_brain}</div>
+        <div style="font-size:24px; font-weight:800; margin-bottom:10px;">Label Decoder</div>
+        <div style="color:#6B7280; margin-bottom:30px;">Upload a product label photo or enter the product name to decode.</div>
     </div>
     """, unsafe_allow_html=True)
-    # The actual functional inputs
-    dec_mode = st.radio("Mode:", ["📸 Photo", "⌨️ Name"], horizontal=True, label_visibility="collapsed")
-    if dec_mode == "📸 Photo":
-        up_file = st.file_uploader("Upload", type=['jpg','png'], label_visibility="collapsed")
+    mode = st.radio("Input Method", ["Upload Image", "Product Name"], horizontal=True, label_visibility="collapsed")
+    if mode == "Upload Image":
+        st.file_uploader("Upload", type=['jpg','png'], label_visibility="collapsed")
     else:
-        p_name = st.text_input("Name", placeholder="e.g. Nutella", label_visibility="collapsed")
-    
-    if st.button("Decode with AI ✨"):
-        # AI Logic Here
-        pass
+        st.text_input("Name", placeholder="e.g. Organic Almond Milk", label_visibility="collapsed")
+    if st.button("Start Analysis"):
+        pass # AI Logic
 
-# 6. THE STATS FOOTER
+# 7. STATS BAR
 st.markdown("""
 <div class="stats-bar">
     <div class="stat-box"><span class="stat-val">100%</span><span class="stat-lab">Private & Secure</span></div>
     <div class="stat-box"><span class="stat-val">AI</span><span class="stat-lab">Powered Insights</span></div>
     <div class="stat-box"><span class="stat-val">Thousands</span><span class="stat-lab">Products Decoded</span></div>
     <div class="stat-box"><span class="stat-val">Better</span><span class="stat-lab">Health Choices</span></div>
-</div>
-<div style="text-align:center; padding-bottom: 50px;">
-    <p style="color: #6B7280; font-size: 14px;">🛡️ We never store your images or personal data. Results are private and secure.</p>
 </div>
 """, unsafe_allow_html=True)
