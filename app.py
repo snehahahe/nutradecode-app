@@ -100,7 +100,7 @@ with col_hero1:
 
 with col_hero2:
     # REPLACE THIS LINK with your uploaded almond packaging mockup
-    st.image("https://img.freepik.com/free-photo/composition-different-supplements_23-2148881434.jpg", use_column_width=True)
+    st.image("https://i.postimg.cc/ZYX0xNdk/30419f86-e1cf-4781-8be1-fc0502830afb.png", use_column_width=True)
 
 # 5. SCANNING SECTION
 st.markdown('<div class="section-header">Choose Your Scanning Option</div>', unsafe_allow_html=True)
