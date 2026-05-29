@@ -9,174 +9,143 @@ import urllib.parse
 # 1. PAGE CONFIG
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="wide")
 
-# 2. PROFESSIONAL SVG ICONS (Replacing Emojis)
-# These are the crisp, professional icons from your mockup
-icon_shield = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>'
-icon_ai = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>'
-icon_private = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
-icon_barcode = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14M21 5v14M7 5v14M17 5v14M12 5v14"></path></svg>'
-icon_brain = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2E4035" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A5.5 5.5 0 0 0 4 7.5c0 1.63.71 3.1 1.83 4.12A4.01 4.01 0 0 0 4 15c0 2.2 1.8 4 4 4h.5c.34 3 2.84 5.5 5.5 5.5a5.5 5.5 0 0 0 5.5-5.5h.5c2.2 0 4-1.8 4-4 0-1.32-.65-2.5-1.65-3.23A5.5 5.5 0 0 0 14.5 2h-5z"></path></svg>'
-
-# 3. ADVANCED DESIGNER CSS
-st.markdown(f"""
+# 2. THE EXACT CSS DESIGN
+st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
 
-    header {{visibility: hidden;}}
-    .main .block-container {{
-        padding-top: 0rem;
-        padding-left: 8%;
-        padding-right: 8%;
-    }}
+    /* Hide Streamlit elements */
+    header {visibility: hidden;}
+    .main .block-container {padding-top: 0rem; padding-bottom: 0rem; padding-left: 6%; padding-right: 6%;}
 
-    .logo-text {{
-        font-size: 32px !important;
-        font-weight: 800;
-        color: #1A261D;
-        letter-spacing: -1px;
-    }}
+    /* Global Typography */
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+        background-color: #FFFFFF;
+    }
 
-    .hero-title {{
-        font-size: 72px;
-        font-weight: 800;
-        color: #1A261D;
-        line-height: 1.05;
-        margin-top: 60px;
-    }}
-    .hero-green {{ color: #4CAF50; }}
+    /* Navbar */
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 0;
+    }
+    .logo { font-size: 26px; font-weight: 800; color: #1A261D; display: flex; align-items: center; gap: 10px; }
+    .nav-links a { text-decoration: none; color: #4B5563; margin-left: 30px; font-size: 15px; font-weight: 500; }
+    .btn-get-started { background: #2E4035; color: white !important; padding: 10px 24px; border-radius: 12px; font-weight: 700; text-decoration: none; }
+
+    /* Hero Section */
+    .hero-title { font-size: 68px; font-weight: 800; color: #1A261D; line-height: 1.1; margin-top: 50px; }
+    .hero-highlight { color: #43A047; }
+    .hero-subtitle { font-size: 18px; color: #6B7280; margin: 25px 0 40px 0; max-width: 500px; line-height: 1.6; }
     
-    .hero-subtitle {{
-        font-size: 20px;
-        color: #5C6E5F;
-        margin: 30px 0;
-        max-width: 550px;
-        line-height: 1.6;
-    }}
+    .feature-row { display: flex; gap: 30px; margin-bottom: 40px; }
+    .feature-item { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: #1A261D; }
+    .icon-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #F3F4F6; }
 
-    .feature-list {{ display: flex; gap: 40px; margin-bottom: 50px; }}
-    .feature-item {{
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        color: #1A261D;
-    }}
+    /* Cards Layout */
+    .section-header { text-align: center; font-size: 28px; font-weight: 800; color: #1A261D; margin: 80px 0 40px 0; }
+    
+    /* Green Card (Left) */
+    .card-green { background: #F1F8F1; border-radius: 32px; padding: 40px; border: 1px solid #E2EEE2; min-height: 380px; }
+    .icon-green { background: white; border-radius: 20px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
 
-    .custom-card {{
-        background: white;
-        border-radius: 32px;
-        padding: 50px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.03);
-        border: 1px solid #F0F2F0;
-        transition: 0.3s;
-    }}
-    .icon-box {{
-        width: 70px;
-        height: 70px;
-        background: #F1F8F1;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 25px;
-    }}
+    /* Purple Card (Right) */
+    .card-purple { background: #F9F5FF; border-radius: 32px; padding: 40px; border: 1px solid #EFE8FF; min-height: 380px; }
+    .icon-purple { background: white; border-radius: 20px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
 
-    /* Stats bar styling */
-    .stats-bar {{
-        display: flex;
-        justify-content: space-around;
-        background: #FFFFFF;
-        padding: 50px;
-        border-radius: 30px;
-        margin: 80px 0;
-        border: 1px solid #F0F2F0;
-    }}
-    .stat-val {{ font-size: 24px; font-weight: 800; color: #1A261D; display: block; }}
-    .stat-lab {{ font-size: 14px; color: #6B7280; font-weight: 500; }}
+    .card-title { font-size: 22px; font-weight: 800; color: #1A261D; margin-bottom: 8px; }
+    .card-text { font-size: 14px; color: #6B7280; line-height: 1.5; margin-bottom: 30px; }
 
-    /* Button Styling */
-    .stButton>button {{
-        background-color: #2E4035 !important;
-        border-radius: 12px;
-        padding: 25px !important;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }}
+    /* Stats Bar */
+    .stats-bar { display: flex; justify-content: space-around; background: #F9FBF9; padding: 40px; border-radius: 24px; margin: 80px 0; }
+    .stat-item { text-align: center; padding: 0 40px; border-right: 1px solid #E5E7EB; }
+    .stat-item:last-child { border-right: none; }
+    .stat-val { font-size: 24px; font-weight: 800; color: #1A261D; display: block; }
+    .stat-lab { font-size: 13px; color: #6B7280; font-weight: 500; }
+
+    /* Custom Streamlit Input Styling */
+    .stTextInput>div>div>input { border-radius: 12px !important; padding: 12px !important; border: 1px solid #D1D5DB !important; }
+    .stButton>button { background: #2E4035 !important; color: white !important; border-radius: 12px !important; padding: 12px 24px !important; width: 100%; border: none !important; font-weight: 700 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# 4. NAVBAR
+# 3. NAVBAR
 st.markdown("""
-<div style="display: flex; justify-content: space-between; align-items: center; padding: 30px 0;">
-    <div class="logo-text">NutraDecode</div>
-    <div style="display: flex; gap: 40px; align-items: center;">
-        <a style="text-decoration:none; color:#4A4A4A; font-weight:600;" href="#">How it works</a>
-        <a style="text-decoration:none; color:#4A4A4A; font-weight:600;" href="#">About</a>
-        <a style="text-decoration:none; color:#4A4A4A; font-weight:600;" href="#">Privacy</a>
-        <div style="background:#2E4035; color:white; padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer;">Get Started</div>
+<div class="nav-container">
+    <div class="logo">🍃 NutraDecode</div>
+    <div class="nav-links">
+        <a href="#">How it works</a>
+        <a href="#">About</a>
+        <a href="#">Privacy</a>
+        <a class="btn-get-started" href="#">Get Started</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 5. HERO SECTION
-col_h1, col_h2 = st.columns([1.3, 1])
+# 4. HERO SECTION
+col_hero1, col_hero2 = st.columns([1.2, 1])
 
-with col_h1:
-    st.markdown(f"""
-    <div class="hero-title">Decode. Understand.<br><span class="hero-green">Choose Better.</span></div>
+with col_hero1:
+    st.markdown("""
+    <div class="hero-title">Decode. Understand.<br><span class="hero-highlight">Choose Better.</span></div>
     <div class="hero-subtitle">NutraDecode helps you instantly decode product labels and make informed, healthier choices.</div>
-    <div class="feature-list">
-        <div class="feature-item">{icon_shield} Transparent</div>
-        <div class="feature-item">{icon_ai} AI-Powered</div>
-        <div class="feature-item">{icon_private} Private</div>
+    <div class="feature-row">
+        <div class="feature-item"><div class="icon-circle">🛡️</div><div><b>Transparent</b><br><span style="font-weight:400; color:#6B7280; font-size:12px;">See what's inside</span></div></div>
+        <div class="feature-item"><div class="icon-circle">✨</div><div><b>AI-Powered</b><br><span style="font-weight:400; color:#6B7280; font-size:12px;">Smart insights</span></div></div>
+        <div class="feature-item"><div class="icon-circle">🔒</div><div><b>Private</b><br><span style="font-weight:400; color:#6B7280; font-size:12px;">Your data stays yours</span></div></div>
     </div>
     """, unsafe_allow_html=True)
 
-with col_h2:
-    # High-quality aesthetic product image
-    st.image("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1000", use_column_width=True)
+with col_hero2:
+    # REPLACE THIS LINK with your uploaded almond packaging mockup
+    st.image("https://i.postimg.cc/15WwSXnh/40377f18-cb60-4453-8b43-b5e9fbbbb005.png", use_column_width=True)
 
-# 6. SCANNING SECTION
-st.markdown('<div style="text-align:center; font-size:32px; font-weight:800; margin: 80px 0 50px 0;">Choose Your Scanning Option</div>', unsafe_allow_html=True)
+# 5. SCANNING SECTION
+st.markdown('<div class="section-header">Choose Your Scanning Option</div>', unsafe_allow_html=True)
 
-c1, c2 = st.columns(2)
+col_card1, col_card2 = st.columns(2)
 
-with c1:
-    st.markdown(f"""
-    <div class="custom-card">
-        <div class="icon-box">{icon_barcode}</div>
-        <div style="font-size:24px; font-weight:800; margin-bottom:10px;">Quick Barcode Scan</div>
-        <div style="color:#6B7280; margin-bottom:30px;">Instantly get insights by scanning a product barcode from our database.</div>
+with col_card1:
+    st.markdown("""
+    <div class="card-green">
+        <div class="icon-green">🔳</div>
+        <div class="card-title">Quick Barcode Scan</div>
+        <div class="card-text">Instantly get insights by scanning a product barcode from the global database.</div>
     </div>
     """, unsafe_allow_html=True)
-    barcode = st.text_input("Barcode Input", label_visibility="collapsed", placeholder="Enter Barcode (e.g. 049000000443)")
+    # Positioning input over the card visually
+    st.write('<style>div.stTextInput {margin-top: -150px; padding: 0 40px;}</style>', unsafe_allow_html=True)
+    barcode = st.text_input("Barcode Search", label_visibility="collapsed", placeholder="Enter Product Barcode (e.g. 049000000443)")
+    st.write('<style>div.stButton {padding: 0 40px; margin-bottom: 50px;}</style>', unsafe_allow_html=True)
     if st.button("Scan Barcode"):
-        pass # Barcode logic
+        pass
 
-with c2:
-    st.markdown(f"""
-    <div class="custom-card">
-        <div class="icon-box">{icon_brain}</div>
-        <div style="font-size:24px; font-weight:800; margin-bottom:10px;">Label Decoder</div>
-        <div style="color:#6B7280; margin-bottom:30px;">Upload a product label photo or enter the product name to decode.</div>
+with col_card2:
+    st.markdown("""
+    <div class="card-purple">
+        <div class="icon-purple">🧠</div>
+        <div class="card-title">Label Decoder</div>
+        <div class="card-text">Upload a product label photo or enter the product name to decode with AI.</div>
     </div>
     """, unsafe_allow_html=True)
-    mode = st.radio("Input Method", ["Upload Image", "Product Name"], horizontal=True, label_visibility="collapsed")
+    st.write('<style>div.stRadio {margin-top: -150px; padding: 0 40px;}</style>', unsafe_allow_html=True)
+    mode = st.radio("Mode", ["Upload Image", "Enter Name"], horizontal=True, label_visibility="collapsed")
     if mode == "Upload Image":
         st.file_uploader("Upload", type=['jpg','png'], label_visibility="collapsed")
     else:
-        st.text_input("Name", placeholder="e.g. Organic Almond Milk", label_visibility="collapsed")
-    if st.button("Start Analysis"):
-        pass # AI Logic
+        st.text_input("Name", placeholder="Product Name", label_visibility="collapsed")
+    if st.button("Start Analysis ✨"):
+        pass
 
-# 7. STATS BAR
+# 6. STATS BAR
 st.markdown("""
+<div style="text-align:center; color:#6B7280; font-size:13px; margin-top:100px;">🛡️ We never store your images or personal data. Results are private and secure.</div>
 <div class="stats-bar">
-    <div class="stat-box"><span class="stat-val">100%</span><span class="stat-lab">Private & Secure</span></div>
-    <div class="stat-box"><span class="stat-val">AI</span><span class="stat-lab">Powered Insights</span></div>
-    <div class="stat-box"><span class="stat-val">Thousands</span><span class="stat-lab">Products Decoded</span></div>
-    <div class="stat-box"><span class="stat-val">Better</span><span class="stat-lab">Health Choices</span></div>
+    <div class="stat-item"><span class="stat-val">100%</span><span class="stat-lab">Private & Secure</span></div>
+    <div class="stat-item"><span class="stat-val">AI</span><span class="stat-lab">Powered Insights</span></div>
+    <div class="stat-item"><span class="stat-val">Thousands</span><span class="stat-lab">Products Decoded</span></div>
+    <div class="stat-item"><span class="stat-val">Better</span><span class="stat-lab">Health Choices</span></div>
 </div>
 """, unsafe_allow_html=True)
