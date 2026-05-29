@@ -6,216 +6,233 @@ import plotly.graph_objects as go
 import re
 import urllib.parse
 
-# 1. PAGE CONFIG
+# 1. PAGE CONFIG (Hiding Streamlit default elements)
 st.set_page_config(page_title="NutraDecode", page_icon="🍃", layout="wide")
 
-# 2. ADVANCED CSS INJECTION (The "Designer" Layer)
+# 2. THE DESIGNER CSS (Matches your image exactly)
 st.markdown("""
 <style>
-    /* Import Professional Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
-    /* Global Styles */
-    .stApp {
-        background: linear-gradient(180deg, #F8FAF8 0%, #FFFFFF 100%);
-        font-family: 'Inter', sans-serif;
+    /* Hide Streamlit Header and Padding */
+    header {visibility: hidden;}
+    .main .block-container {
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+        padding-left: 5rem;
+        padding-right: 5rem;
     }
 
-    /* Navbar Styling */
+    /* Global Body */
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+        background-color: #F8FAF8;
+    }
+
+    /* Navbar */
     .nav-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1rem 5%;
-        background: white;
-        border-bottom: 1px solid #EAEAEA;
+        padding: 20px 0;
+        background-color: transparent;
+    }
+    .logo-text {
+        font-size: 28px !important; /* Increased as requested */
+        font-weight: 800;
+        color: #1A261D;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .nav-links {
+        display: flex;
+        gap: 30px;
+        align-items: center;
     }
     .nav-links a {
         text-decoration: none;
         color: #4A4A4A;
-        margin: 0 15px;
-        font-size: 14px;
+        font-size: 15px;
+        font-weight: 500;
     }
-    .get-started-btn {
+    .btn-get-started {
         background-color: #2E4035;
         color: white !important;
-        padding: 8px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 600;
     }
 
     /* Hero Section */
     .hero-title {
-        font-family: 'Playfair Display', serif;
-        font-size: 55px;
+        font-size: 64px;
+        font-weight: 800;
         color: #1A261D;
         line-height: 1.1;
-        margin-bottom: 20px;
+        margin-top: 40px;
+    }
+    .hero-green {
+        color: #4CAF50;
     }
     .hero-subtitle {
-        color: #556B2F;
         font-size: 18px;
-        margin-bottom: 30px;
+        color: #5C6E5F;
+        margin: 25px 0;
+        max-width: 500px;
+        line-height: 1.6;
     }
-    .feature-tag {
-        display: inline-flex;
+    .feature-list {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    .feature-item {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1A261D;
+        display: flex;
         align-items: center;
-        margin-right: 20px;
-        font-size: 14px;
-        color: #2E4035;
+        gap: 5px;
     }
 
-    /* Scanning Cards */
-    .section-title {
+    /* Cards Section */
+    .choose-title {
         text-align: center;
-        font-size: 24px;
-        font-weight: bold;
+        font-size: 28px;
+        font-weight: 800;
         color: #1A261D;
-        margin-top: 50px;
-        margin-bottom: 30px;
+        margin: 60px 0 40px 0;
     }
     .custom-card {
         background: white;
+        border-radius: 30px;
         padding: 40px;
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.02);
         border: 1px solid #F0F2F0;
-        min-height: 350px;
+        height: 100%;
     }
-    
-    /* Stats Bar */
-    .stats-container {
+    .card-icon-container {
+        width: 60px;
+        height: 60px;
+        background: #F1F8F1;
+        border-radius: 15px;
         display: flex;
-        justify-content: space-around;
-        padding: 40px 0;
-        background: #F9FBF9;
-        border-radius: 20px;
-        margin-top: 60px;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin-bottom: 20px;
     }
-    .stat-item {
-        text-align: center;
-    }
-    .stat-number {
-        font-weight: bold;
-        font-size: 20px;
+    .card-title {
+        font-size: 22px;
+        font-weight: 800;
         color: #1A261D;
-        display: block;
+        margin-bottom: 10px;
     }
-    .stat-label {
-        font-size: 13px;
+    .card-desc {
+        font-size: 14px;
         color: #6B7280;
+        margin-bottom: 30px;
+        line-height: 1.4;
     }
 
-    /* Input & Button Styling */
-    .stTextInput>div>div>input {
-        border-radius: 12px;
-        border: 1px solid #E0E0E0;
-        padding: 12px;
+    /* Bottom Stats Bar */
+    .stats-bar {
+        display: flex;
+        justify-content: space-around;
+        background: #FFFFFF;
+        padding: 40px;
+        border-radius: 25px;
+        margin: 60px 0;
+        border: 1px solid #F0F2F0;
     }
-    .stButton>button {
-        width: 100%;
-        background-color: #2E4035 !important;
-        color: white !important;
-        border-radius: 12px;
-        padding: 12px;
-        font-weight: bold;
-        border: none;
-    }
+    .stat-box { text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #1A261D; display: block; }
+    .stat-lab { font-size: 14px; color: #6B7280; }
+
+    /* Hide Streamlit's red error boxes for custom styling */
+    .stAlert { border-radius: 15px; }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. TOP NAVIGATION
+# 3. THE NAVIGATION BAR
 st.markdown("""
 <div class="nav-container">
-    <div style="font-size: 22px; font-weight: bold; color: #2E4035;">🍃 NutraDecode</div>
+    <div class="logo-text">🍃 NutraDecode</div>
     <div class="nav-links">
         <a href="#">How it works</a>
         <a href="#">About</a>
         <a href="#">Privacy</a>
-        <a class="get-started-btn" href="#">Get Started</a>
+        <a class="btn-get-started" href="#">Get Started</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# 4. HERO SECTION
-st.write("") # Spacing
-hero_col1, hero_col2 = st.columns([1.2, 1])
+# 4. THE HERO SECTION
+col_hero1, col_hero2 = st.columns([1.2, 1])
 
-with hero_col1:
-    st.write("")
-    st.markdown('<h1 class="hero-title">Decode. Understand.<br><span style="color: #4CAF50;">Choose Better.</span></h1>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">NutraDecode helps you instantly decode product labels and make informed, healthier choices.</p>', unsafe_allow_html=True)
-    
-    # Feature icons
+with col_hero1:
     st.markdown("""
-    <div style="display: flex;">
-        <div class="feature-tag">🛡️ <b>Transparent</b></div>
-        <div class="feature-tag">✨ <b>AI-Powered</b></div>
-        <div class="feature-tag">🔒 <b>Private</b></div>
+    <div class="hero-title">Decode. Understand.<br><span class="hero-green">Choose Better.</span></div>
+    <div class="hero-subtitle">NutraDecode helps you instantly decode product labels and make informed, healthier choices.</div>
+    <div class="feature-list">
+        <div class="feature-item">🛡️ Transparent</div>
+        <div class="feature-item">✨ AI-Powered</div>
+        <div class="feature-item">🔒 Private</div>
     </div>
     """, unsafe_allow_html=True)
 
-with hero_col2:
-    # This simulates the "Phone Mockup" side of your image
-    st.image("https://img.freepik.com/free-photo/healthy-food-background_23-2148119103.jpg", use_column_width=True)
+with col_hero2:
+    # This is where your Golden Halftone / Phone mockup image goes
+    st.image("https://i.imgur.com/your_uploaded_image.png", use_column_width=True)
 
-# 5. SCANNING OPTIONS
-st.markdown('<div class="section-title">Choose Your Scanning Option</div>', unsafe_allow_html=True)
+# 5. THE SCANNING CARDS
+st.markdown('<div class="choose-title">Choose Your Scanning Option</div>', unsafe_allow_html=True)
 
-card_col1, card_col2 = st.columns(2)
+col_card1, col_card2 = st.columns(2)
 
-with card_col1:
-    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-    st.markdown("### 🔍 Quick Barcode Scan")
-    st.caption("Instantly get insights by scanning a product barcode.")
-    barcode = st.text_input("Enter Barcode", placeholder="049000000443", label_visibility="collapsed")
-    if st.button("Scan Barcode"):
-        # (Logics for barcode remain the same as before)
+with col_card1:
+    st.markdown("""
+    <div class="custom-card">
+        <div class="card-icon-container">🔍</div>
+        <div class="card-title">Quick Barcode Scan</div>
+        <div class="card-desc">Instantly get insights by scanning a product barcode from the database.</div>
+    </div>
+    """, unsafe_allow_html=True)
+    # The actual functional input placed right below the card title
+    barcode = st.text_input("Barcode", label_visibility="collapsed", placeholder="Enter Barcode (e.g. 049000000443)")
+    if st.button("Scan Barcode 🚀"):
+        # Barcode Logic Here
         pass
-    st.markdown('</div>', unsafe_allow_html=True)
 
-with card_col2:
-    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-    st.markdown("### 🧠 Label Decoder")
-    st.caption("Upload a product label or enter the product name to decode.")
-    
-    # Selection for decoder
-    decoder_mode = st.selectbox("Method:", ["Upload Image", "Enter Name"])
-    
-    if decoder_mode == "Upload Image":
-        uploaded_file = st.file_uploader("Upload...", type=["jpg", "png"], label_visibility="collapsed")
+with col_card2:
+    st.markdown("""
+    <div class="custom-card">
+        <div class="card-icon-container">🧠</div>
+        <div class="card-title">Label Decoder</div>
+        <div class="card-desc">Upload a product label photo or enter the product name to decode with AI.</div>
+    </div>
+    """, unsafe_allow_html=True)
+    # The actual functional inputs
+    dec_mode = st.radio("Mode:", ["📸 Photo", "⌨️ Name"], horizontal=True, label_visibility="collapsed")
+    if dec_mode == "📸 Photo":
+        up_file = st.file_uploader("Upload", type=['jpg','png'], label_visibility="collapsed")
     else:
-        product_name = st.text_input("Enter Name", placeholder="e.g. Nutella", label_visibility="collapsed")
-        
+        p_name = st.text_input("Name", placeholder="e.g. Nutella", label_visibility="collapsed")
+    
     if st.button("Decode with AI ✨"):
-        # (AI Logic remains the same as before)
+        # AI Logic Here
         pass
-    st.markdown('</div>', unsafe_allow_html=True)
 
-# 6. STATS FOOTER
+# 6. THE STATS FOOTER
 st.markdown("""
-<div class="stats-container">
-    <div class="stat-item">
-        <span class="stat-number">100%</span>
-        <span class="stat-label">Private & Secure</span>
-    </div>
-    <div class="stat-item">
-        <span class="stat-number">AI</span>
-        <span class="stat-label">Powered Insights</span>
-    </div>
-    <div class="stat-item">
-        <span class="stat-number">Thousands</span>
-        <span class="stat-label">Products Decoded</span>
-    </div>
-    <div class="stat-item">
-        <span class="stat-number">Better</span>
-        <span class="stat-label">Health Choices</span>
-    </div>
+<div class="stats-bar">
+    <div class="stat-box"><span class="stat-val">100%</span><span class="stat-lab">Private & Secure</span></div>
+    <div class="stat-box"><span class="stat-val">AI</span><span class="stat-lab">Powered Insights</span></div>
+    <div class="stat-box"><span class="stat-val">Thousands</span><span class="stat-lab">Products Decoded</span></div>
+    <div class="stat-box"><span class="stat-val">Better</span><span class="stat-lab">Health Choices</span></div>
+</div>
+<div style="text-align:center; padding-bottom: 50px;">
+    <p style="color: #6B7280; font-size: 14px;">🛡️ We never store your images or personal data. Results are private and secure.</p>
 </div>
 """, unsafe_allow_html=True)
-
-# Sidebar (Keep your dietary profile settings here)
-with st.sidebar:
-    st.title("👤 Profile")
-    diet_prefs = st.multiselect("Restrictions:", ["Vegan", "Keto", "Nut Allergy", "Pregnant"])
