@@ -64,20 +64,24 @@ c1, c2 = st.columns(2)
 with c1:
     st.markdown('<div class="card-green"><h3>🔍 Quick Barcode Scan</h3></div>', unsafe_allow_html=True)
     st.write('<style>div.stTextInput {margin-top: -260px; padding: 0 40px;}</style>', unsafe_allow_html=True)
-    barcode = st.text_input("B", label_visibility="collapsed", placeholder="Enter Barcode")
+    barcode = st.text_input("B", key="bar_input", label_visibility="collapsed", placeholder="Enter Barcode")
     if st.button("Scan Barcode"): pass
 
 with c2:
     st.markdown('<div class="card-purple"><h3>🧠 Label Decoder</h3></div>', unsafe_allow_html=True)
     st.write('<style>div.stRadio {margin-top: -260px; padding: 0 40px;}</style>', unsafe_allow_html=True)
     mode = st.radio("M", ["📸 Photo Scan", "⌨️ Product Name"], horizontal=True, label_visibility="collapsed")
+    
     up, p_name = None, ""
+    
+    # MODIFIED: Logic for both inputs in Photo Scan mode
     if mode == "📸 Photo Scan":
         up = st.file_uploader("U", type=['jpg','png'], label_visibility="collapsed")
+        p_name = st.text_input("N_photo", placeholder="Step 2: Enter Product Name (Required)", label_visibility="collapsed")
     else:
-        p_name = st.text_input("N", placeholder="Enter Product Name", label_visibility="collapsed")
+        p_name = st.text_input("N_name", placeholder="Enter Product Name", label_visibility="collapsed")
 
-    # 7. REARRANGED SYSTEM PROMPT
+    # 7. SYSTEM PROMPT
     diet = st.session_state.get('diet', 'None')
     system_prompt = f"""
     You are "NutraDecode," an elite Food Scientist and Pharmacist AI. Analyze for diet: {diet}.
@@ -117,14 +121,24 @@ with c2:
     """
 
     if st.button("Decode with AI"):
-        if model and (up or p_name):
+        # Logic check: if in photo mode, both are required
+        if mode == "📸 Photo Scan" and (not up or not p_name):
+            st.warning("Please both upload a photo AND type the product name for a photo analysis.")
+        elif mode == "⌨️ Product Name" and not p_name:
+            st.warning("Please type a product name.")
+        elif model:
             with st.spinner("Analyzing profile and generating report..."):
                 try:
                     img = Image.open(up) if up else None
-                    response = model.generate_content([system_prompt, img]) if img else model.generate_content(f"{system_prompt}\nProduct: {p_name}")
-                    text = response.text
+                    # We pass both the image and the name to the AI for max accuracy
+                    if img and p_name:
+                        response = model.generate_content([system_prompt, img, f"The product name is: {p_name}"])
+                    elif img:
+                        response = model.generate_content([system_prompt, img])
+                    else:
+                        response = model.generate_content(f"{system_prompt}\nProduct: {p_name}")
                     
-                    # Logic to extract score for the gauge
+                    text = response.text
                     score = 50
                     match = re.search(r'NUTRASCORE:\s*(\d+)', text)
                     if match: 
