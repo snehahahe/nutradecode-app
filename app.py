@@ -16,26 +16,28 @@ st.markdown("""
     header {visibility: hidden;}
     .main .block-container {padding-top: 0rem; padding-bottom: 0rem; padding-left: 8%; padding-right: 8%;}
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; background-color: #FFFFFF; }
-    .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; }
     .logo-text { font-size: 28px !important; font-weight: 800; color: #1A261D; letter-spacing: -0.5px; }
-    .hero-title { font-size: 64px; font-weight: 800; color: #1A261D; line-height: 1.1; margin-top: 40px; }
-    .hero-green { color: #43A047; }
-    .card-green { background: #F1F8F1; border-radius: 32px; padding: 40px; border: 1px solid #E2EEE2; min-height: 380px; }
-    .card-purple { background: #F9F5FF; border-radius: 32px; padding: 40px; border: 1px solid #EFE8FF; min-height: 380px; }
-    .stats-bar { display: flex; justify-content: space-around; background: #F9FBF9; padding: 40px; border-radius: 24px; margin: 80px 0; border: 1px solid #F0F2F0; }
-    .stButton>button { background: #2E4035 !important; color: white !important; border-radius: 12px !important; padding: 25px !important; width: 100%; border: none !important; font-weight: 700 !important; }
+    .stButton>button { background: #2E4035 !important; color: white !important; border-radius: 12px !important; padding: 25px !important; width: 100%; font-weight: 700 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. CONFIGURE AI
+# 3. CONFIGURE AI (WITH TEMPERATURE 0.1 FOR MAXIMUM CONSISTENCY)
 api_key = st.secrets.get("GEMINI_API_KEY")
 model = None
 if api_key:
     genai.configure(api_key=api_key)
     try:
-        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        model_name = 'gemini-1.5-flash' if 'models/gemini-1.5-flash' in available_models else available_models[0].replace('models/', '')
-        model = genai.GenerativeModel(model_name)
+        # We set temperature to 0.1 to make the AI factual and consistent
+        generation_config = {
+            "temperature": 0.1,
+            "top_p": 1,
+            "top_k": 32,
+            "max_output_tokens": 2048,
+        }
+        model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash',
+            generation_config=generation_config
+        )
     except: pass
 
 def draw_nutrascore(score):
@@ -52,93 +54,85 @@ def draw_nutrascore(score):
 # 4. NAVBAR
 st.markdown(f'<div class="nav-container"><div class="logo-text">🍃 NutraDecode</div></div>', unsafe_allow_html=True)
 
-# 5. HERO
+# 5. SCANNING SECTION (Visuals only)
 col_h1, col_h2 = st.columns([1.2, 1])
 with col_h1:
-    st.markdown('<div class="hero-title">Decode. Understand.<br><span class="hero-green">Choose Better.</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title" style="font-size:64px; font-weight:800; color:#1A261D;">Decode. Understand.<br><span style="color:#43A047;">Choose Better.</span></div>', unsafe_allow_html=True)
 with col_h2:
     st.image("https://i.postimg.cc/ZYX0xNdk/30419f86-e1cf-4781-8be1-fc0502830afb.png", use_column_width=True)
 
-# 6. SCANNING SECTION
+st.markdown("---")
 c1, c2 = st.columns(2)
 with c1:
-    st.markdown('<div class="card-green"><h3>🔍 Quick Barcode Scan</h3></div>', unsafe_allow_html=True)
-    st.write('<style>div.stTextInput {margin-top: -260px; padding: 0 40px;}</style>', unsafe_allow_html=True)
-    barcode = st.text_input("B", label_visibility="collapsed", placeholder="Enter Barcode")
-    if st.button("Scan Barcode"): pass
-
+    barcode = st.text_input("Barcode Search", placeholder="Enter Barcode")
 with c2:
-    st.markdown('<div class="card-purple"><h3>🧠 Label Decoder</h3></div>', unsafe_allow_html=True)
-    st.write('<style>div.stRadio {margin-top: -260px; padding: 0 40px;}</style>', unsafe_allow_html=True)
-    mode = st.radio("M", ["📸 Photo Scan", "⌨️ Product Name"], horizontal=True, label_visibility="collapsed")
-    up, p_name = None, ""
-    if mode == "📸 Photo Scan":
-        up = st.file_uploader("U", type=['jpg','png'], label_visibility="collapsed")
-    else:
-        p_name = st.text_input("N", placeholder="Enter Product Name", label_visibility="collapsed")
+    mode = st.radio("Input Method", ["📸 Photo Scan", "⌨️ Product Name"], horizontal=True)
+    up = st.file_uploader("Upload Label", type=['jpg','png'], label_visibility="collapsed") if mode == "📸 Photo Scan" else None
+    p_name = st.text_input("N", placeholder="Enter Product Name", label_visibility="collapsed") if mode == "⌨️ Product Name" else ""
 
-    # 7. REARRANGED SYSTEM PROMPT
-    diet = st.session_state.get('diet', 'None')
-    system_prompt = f"""
-    You are "NutraDecode," an elite Food Scientist and Pharmacist AI. Analyze for diet: {diet}.
-    
-    YOU MUST FOLLOW THIS EXACT ORDER AND HEADINGS:
+# 6. UPDATED FACT-BASED SYSTEM PROMPT
+diet = st.session_state.get('diet', 'None')
+system_prompt = f"""
+You are "NutraDecode," a Clinical Food Scientist. 
+CRITICAL MISSION: Use ONLY the visible text in the provided image. Do not use external brand knowledge if it contradicts the image.
 
-    IF FOOD/DRINK/ICE CREAM:
-    1. Start with 'NUTRASCORE: [0-100]'
-    2. 🍎 **Product:** [Name]
-    3. 🎯 **The Claim Check:** 
-       - Claims Identified: [e.g. "Zero Sugar"]
-       - The Scientific Truth: [e.g. "Uses Maltodextrin which spikes blood sugar"]
-    4. ⚠️ **Who Should Avoid This:** 
-       - [List specific medical conditions and WHY]
-    5. ⚖️ **Serving Size & When to Consume**: [Serving context and frequency]
-    6. 🔬 **Exact Ingredient Breakdown:** 
-       - [Ingredient Name]: [Detailed explanation of its purpose and processing degree]
+STEP 1: TRANSCRIBE the Product Name and the FULL Ingredient list as seen in the image.
+STEP 2: TRANSCRIBE the Nutrition Facts Table (Energy, Sugars, Sat Fat, Sodium, Protein, Fiber).
 
-    --- DEEPER ANALYSIS ---
-    7. **NutraDecode Expert Analysis**: (Classify processing via NOVA/Monteiro system and discuss long-term disease risks).
-    8. **Nutritional Breakdown (per 100g)**: (Table including Energy, Carbs, Sugars, Fats, Protein, Sodium).
-    9. **Nutra-Score Calculation (based on official algorithm)**: 
-       - **Negative Points (A points)**: [Math for Energy, Saturated Fat, Sugars, Sodium]
-       - **Positive Points (C points)**: [Math for Fibre, Protein, Fruits/Veg/Nuts]
-       - **Final Logic**: [Show the Final Grade A-E calculation]
-    10. **Citations**: [Mandatory PubMed references with PMID]
+FOLLOW THIS EXACT RESPONSE FORMAT:
 
-    IF SUPPLEMENT/MEDICINE:
-    1. 💊 **Product:** [Name]
-    2. **Primary Purpose**: [2 sentences]
-    3. ⚠️ **Who Should Avoid This**
-    4. 🔬 **What's Inside & Why (Active Ingredients)**
-    5. ⏱️ **When & How to Consume**
-    6. ⚖️ **Dosage**
-    7. 🚫 **What NOT to take alongside this**
-    8. **Citations**: [PubMed references with PMID]
-    """
+NUTRASCORE: [Calculated Number 0-100]
 
-    if st.button("Decode with AI"):
-        if model and (up or p_name):
-            with st.spinner("Analyzing profile and generating report..."):
-                try:
-                    img = Image.open(up) if up else None
-                    response = model.generate_content([system_prompt, img]) if img else model.generate_content(f"{system_prompt}\nProduct: {p_name}")
-                    text = response.text
-                    
-                    # Logic to extract score for the gauge
-                    score = 50
-                    match = re.search(r'NUTRASCORE:\s*(\d+)', text)
-                    if match: 
-                        score = int(match.group(1))
-                        text = re.sub(r'NUTRASCORE:\s*\d+\n?', '', text)
-                    
-                    st.plotly_chart(draw_nutrascore(score), use_container_width=True)
-                    st.markdown(text)
-                except Exception as e: st.error(f"Error: {e}")
+🍎 **Product Name (as seen on label):** [Name]
 
-# 8. STATS BAR
-st.markdown('<div class="stats-bar"><div style="text-align:center;"><span class="stat-val">100%</span><span class="stat-lab">Private</span></div><div style="text-align:center;"><span class="stat-val">AI</span><span class="stat-lab">Insights</span></div><div style="text-align:center;"><span class="stat-val">Thousands</span><span class="stat-lab">Decoded</span></div><div style="text-align:center;"><span class="stat-val">Better</span><span class="stat-lab">Choices</span></div></div>', unsafe_allow_html=True)
+🎯 **The Claim Check:** 
+- Claims Identified: [e.g. "High Protein"]
+- The Scientific Truth: [e.g. "Product is actually 40% sugar, negating protein benefits"]
+
+⚠️ **Who Should Avoid This:** 
+- [Based on the transcribed ingredients and the user's diet: {diet}]
+
+⚖️ **Serving Size & When to Consume:** [Specific context]
+
+🔬 **Exact Ingredient Breakdown:** 
+- [Ingredient]: [Purpose/Processing Level]
+
+--- DEEPER ANALYSIS ---
+**NutraDecode Expert Analysis**:
+Classify via NOVA System. Explain long-term health risks of these specific transcribed ingredients.
+
+**Nutritional Breakdown (per 100g)**:
+[Table of values found in Step 2]
+
+**Nutra-Score Calculation (Official Algorithm)**:
+- **Negative Points (A points)**: Energy, Saturated Fat, Sugars, Sodium math.
+- **Positive Points (C points)**: Fruits/Veg/Nuts, Fibre, Protein math.
+- **Final Logic**: (A points - C points) mapped to Grade A-E.
+
+**Citations**:
+[PubMed references with PMID]
+"""
+
+if st.button("Decode with AI"):
+    if model and (up or p_name):
+        with st.spinner("Extracting label data and performing clinical analysis..."):
+            try:
+                img = Image.open(up) if up else None
+                # Force the AI to be grounded in the image text
+                response = model.generate_content([system_prompt, img]) if img else model.generate_content(f"{system_prompt}\nProduct: {p_name}")
+                text = response.text
+                
+                score = 50
+                match = re.search(r'NUTRASCORE:\s*(\d+)', text)
+                if match: 
+                    score = int(match.group(1))
+                    text = re.sub(r'NUTRASCORE:\s*\d+\n?', '', text)
+                
+                st.plotly_chart(draw_nutrascore(score), use_container_width=True)
+                st.markdown(text)
+            except Exception as e: st.error(f"Error: {e}")
 
 # SIDEBAR
 with st.sidebar:
     st.markdown('<div class="logo-text">🍃 NutraDecode</div>', unsafe_allow_html=True)
-    st.session_state['diet'] = st.multiselect("Profile:", ["Vegan", "Keto", "Halal", "Nut Allergy", "Pregnant"])
+    st.session_state['diet'] = st.multiselect("Dietary Profile:", ["Vegan", "Keto", "Halal", "Nut Allergy", "Pregnant"])
