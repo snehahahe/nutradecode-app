@@ -56,7 +56,6 @@ st.markdown(f'<div class="nav-container"><div class="logo-text">🍃 NutraDecode
 col_h1, col_h2 = st.columns([1.2, 1])
 with col_h1:
     st.markdown('<div class="hero-title">Decode. Understand.<br><span class="hero-green">Choose Better.</span></div>', unsafe_allow_html=True)
-    st.markdown('<p style="color:#6B7280; font-size:18px; margin:20px 0;">Factual insights for a healthier you.</p>', unsafe_allow_html=True)
 with col_h2:
     st.image("https://i.postimg.cc/ZYX0xNdk/30419f86-e1cf-4781-8be1-fc0502830afb.png", use_column_width=True)
 
@@ -78,39 +77,39 @@ with c2:
     else:
         p_name = st.text_input("N", placeholder="Enter Product Name", label_visibility="collapsed")
 
-    # 7. THE EXACT FORMAT PROMPT
+    # 7. REARRANGED SYSTEM PROMPT
     diet = st.session_state.get('diet', 'None')
     system_prompt = f"""
     You are "NutraDecode," an elite Food Scientist and Pharmacist AI. Analyze for diet: {diet}.
     
-    CRITICAL: YOU MUST FOLLOW THIS EXACT ORDER AND HEADINGS.
+    YOU MUST FOLLOW THIS EXACT ORDER AND HEADINGS:
 
     IF FOOD/DRINK/ICE CREAM:
     1. Start with 'NUTRASCORE: [0-100]'
     2. 🍎 **Product:** [Name]
     3. 🎯 **The Claim Check:** 
        - Claims Identified: [e.g. "Zero Sugar"]
-       - The Scientific Truth: [e.g. "Uses Maltodextrin"]
-    4. 🔬 **Exact Ingredient Breakdown:** 
-       - [Ingredient Name]: [Why it was added]
-    5. ⚠️ **Who Should Avoid This:** 
-       - [Warnings for specific groups]
-    6. ⚖️ **Serving Size & When to Consume**
-    
+       - The Scientific Truth: [e.g. "Uses Maltodextrin which spikes blood sugar"]
+    4. ⚠️ **Who Should Avoid This:** 
+       - [List specific medical conditions and WHY]
+    5. ⚖️ **Serving Size & When to Consume**: [Serving context and frequency]
+    6. 🔬 **Exact Ingredient Breakdown:** 
+       - [Ingredient Name]: [Detailed explanation of its purpose and processing degree]
+
     --- DEEPER ANALYSIS ---
-    7. **NutraDecode Expert Analysis**: (Describe processing level via Monteiro classification and long-term risks).
-    8. **Nutritional Breakdown (per 100g)**: (Provide table of Energy, Carbs, Sugars, Fats, Protein, Sodium).
+    7. **NutraDecode Expert Analysis**: (Classify processing via NOVA/Monteiro system and discuss long-term disease risks).
+    8. **Nutritional Breakdown (per 100g)**: (Table including Energy, Carbs, Sugars, Fats, Protein, Sodium).
     9. **Nutra-Score Calculation (based on official algorithm)**: 
-       - **Negative Points**: [Math for Energy, Sat Fat, Sugars, Sodium]
-       - **Positive Points**: [Math for Fibre, Protein, Veg/Nuts]
-       - **Final Grade**: [A-E Calculation]
-    10. **Citations**: [PubMed references with PMID]
+       - **Negative Points (A points)**: [Math for Energy, Saturated Fat, Sugars, Sodium]
+       - **Positive Points (C points)**: [Math for Fibre, Protein, Fruits/Veg/Nuts]
+       - **Final Logic**: [Show the Final Grade A-E calculation]
+    10. **Citations**: [Mandatory PubMed references with PMID]
 
     IF SUPPLEMENT/MEDICINE:
     1. 💊 **Product:** [Name]
     2. **Primary Purpose**: [2 sentences]
-    3. 🔬 **What's Inside & Why (Active Ingredients)**
-    4. ⚠️ **Who Should Avoid This**
+    3. ⚠️ **Who Should Avoid This**
+    4. 🔬 **What's Inside & Why (Active Ingredients)**
     5. ⏱️ **When & How to Consume**
     6. ⚖️ **Dosage**
     7. 🚫 **What NOT to take alongside this**
@@ -119,14 +118,18 @@ with c2:
 
     if st.button("Decode with AI"):
         if model and (up or p_name):
-            with st.spinner("Generating Scientific Report..."):
+            with st.spinner("Analyzing profile and generating report..."):
                 try:
                     img = Image.open(up) if up else None
                     response = model.generate_content([system_prompt, img]) if img else model.generate_content(f"{system_prompt}\nProduct: {p_name}")
                     text = response.text
+                    
+                    # Logic to extract score for the gauge
                     score = 50
                     match = re.search(r'NUTRASCORE:\s*(\d+)', text)
-                    if match: score = int(match.group(1)); text = re.sub(r'NUTRASCORE:\s*\d+\n?', '', text)
+                    if match: 
+                        score = int(match.group(1))
+                        text = re.sub(r'NUTRASCORE:\s*\d+\n?', '', text)
                     
                     st.plotly_chart(draw_nutrascore(score), use_container_width=True)
                     st.markdown(text)
